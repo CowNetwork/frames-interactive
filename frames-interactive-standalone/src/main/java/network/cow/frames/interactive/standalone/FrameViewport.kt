@@ -1,4 +1,4 @@
-package network.cow.interactive.standalone
+package network.cow.frames.interactive.standalone
 
 import java.awt.Color
 import java.awt.Dimension

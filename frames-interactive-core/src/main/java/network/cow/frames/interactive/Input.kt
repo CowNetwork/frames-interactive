@@ -1,9 +1,9 @@
-package network.cow.interactive
+package network.cow.frames.interactive
 
 /**
  * @author Benedikt Wüller
  */
-enum class Key {
+enum class Input {
 
     KEY_UP,
     KEY_DOWN,
@@ -12,7 +12,7 @@ enum class Key {
     KEY_SPACE,
     KEY_SHIFT,
 
-    MOUSE_LEFT,
-    MOUSE_RIGHT
+    INTERACT_PRIMARY,
+    INTERACT_SECONDARY
 
 }

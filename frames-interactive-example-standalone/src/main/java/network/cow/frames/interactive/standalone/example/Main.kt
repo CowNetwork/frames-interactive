@@ -1,7 +1,7 @@
-package network.cow.interactive.standalone.example
+package network.cow.frames.interactive.standalone.example
 
-import network.cow.interactive.example.ExampleFrame
-import network.cow.interactive.standalone.FrameWindow
+import network.cow.frames.interactive.example.ExampleFrame
+import network.cow.frames.interactive.standalone.FrameWindow
 import java.awt.Dimension
 
 /**

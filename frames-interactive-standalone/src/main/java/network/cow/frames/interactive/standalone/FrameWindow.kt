@@ -1,7 +1,8 @@
-package network.cow.interactive.standalone
+package network.cow.frames.interactive.standalone
 
-import network.cow.interactive.InteractiveFrame
-import network.cow.interactive.Key
+import network.cow.frames.interactive.InteractiveFrame
+import network.cow.frames.interactive.Input
+import network.cow.frames.interactive.State
 import java.awt.BorderLayout
 import java.awt.Point
 import java.awt.event.KeyEvent
@@ -46,9 +47,9 @@ class FrameWindow(private val frameProvider: () -> InteractiveFrame, title: Stri
                 if (frame.isPaused) return
 
                 if (event.button == MouseEvent.BUTTON1) {
-                    frame.setKeyPressed(Key.MOUSE_LEFT, true)
+                    frame.setInputActive(Input.INTERACT_PRIMARY, true)
                 } else if (event.button == MouseEvent.BUTTON3) {
-                    frame.setKeyPressed(Key.MOUSE_RIGHT, true)
+                    frame.setInputActive(Input.INTERACT_SECONDARY, true)
                 }
             }
 
@@ -56,9 +57,9 @@ class FrameWindow(private val frameProvider: () -> InteractiveFrame, title: Stri
                 if (frame.isPaused) return
 
                 if (event.button == MouseEvent.BUTTON1) {
-                    frame.setKeyPressed(Key.MOUSE_LEFT, false)
+                    frame.setInputActive(Input.INTERACT_PRIMARY, false)
                 } else if (event.button == MouseEvent.BUTTON3) {
-                    frame.setKeyPressed(Key.MOUSE_RIGHT, false)
+                    frame.setInputActive(Input.INTERACT_SECONDARY, false)
                 }
             }
         })
@@ -74,6 +75,16 @@ class FrameWindow(private val frameProvider: () -> InteractiveFrame, title: Stri
                 frame.setViewportCursorPosition(Point(event.x, event.y))
             }
         })
+
+        this.reset()
+    }
+
+    fun reset() {
+        this.frame = this.frameProvider()
+        this.frame.addStateListener { _, newState ->
+            if (newState != State.INACTIVE) return@addStateListener
+            this.reset()
+        }
     }
 
     fun start() {
@@ -108,21 +119,26 @@ class FrameWindow(private val frameProvider: () -> InteractiveFrame, title: Stri
         this.viewport.paintImmediately(0, 0, this.viewport.width, this.viewport.height)
     }
 
-    private fun mapKey(keyCode: Int): Key? {
+    private fun mapKey(keyCode: Int): Input? {
         when (keyCode) {
-            KeyEvent.VK_W, KeyEvent.VK_UP -> return Key.KEY_UP
-            KeyEvent.VK_A, KeyEvent.VK_LEFT -> return Key.KEY_LEFT
-            KeyEvent.VK_S, KeyEvent.VK_DOWN -> return Key.KEY_DOWN
-            KeyEvent.VK_D, KeyEvent.VK_RIGHT -> return Key.KEY_RIGHT
-            KeyEvent.VK_SPACE -> return Key.KEY_SPACE
-            KeyEvent.VK_SHIFT -> return Key.KEY_SHIFT
+            KeyEvent.VK_W, KeyEvent.VK_UP -> return Input.KEY_UP
+            KeyEvent.VK_A, KeyEvent.VK_LEFT -> return Input.KEY_LEFT
+            KeyEvent.VK_S, KeyEvent.VK_DOWN -> return Input.KEY_DOWN
+            KeyEvent.VK_D, KeyEvent.VK_RIGHT -> return Input.KEY_RIGHT
+            KeyEvent.VK_SPACE -> return Input.KEY_SPACE
+            KeyEvent.VK_SHIFT -> return Input.KEY_SHIFT
         }
         return null
     }
 
     override fun keyPressed(event: KeyEvent) {
         if (event.keyCode == KeyEvent.VK_ESCAPE) {
-            this.frame = this.frameProvider()
+            this.reset()
+            return
+        }
+
+        if (this.frame.state == State.INACTIVE) {
+            this.frame.state = State.ACTIVE
             return
         }
 
@@ -136,12 +152,12 @@ class FrameWindow(private val frameProvider: () -> InteractiveFrame, title: Stri
         }
 
         val key = this.mapKey(event.keyCode) ?: return
-        this.frame.setKeyPressed(key, true)
+        this.frame.setInputActive(key, true)
     }
 
     override fun keyReleased(event: KeyEvent) {
         val key = this.mapKey(event.keyCode) ?: return
-        this.frame.setKeyPressed(key, false)
+        this.frame.setInputActive(key, false)
     }
 
     override fun keyTyped(event: KeyEvent) = Unit
