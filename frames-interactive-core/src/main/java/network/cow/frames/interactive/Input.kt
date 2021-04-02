@@ -12,7 +12,6 @@ enum class Input {
     KEY_SPACE,
     KEY_SHIFT,
 
-    INTERACT_PRIMARY,
-    INTERACT_SECONDARY
+    INTERACT_PRIMARY
 
 }

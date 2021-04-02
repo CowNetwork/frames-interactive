@@ -18,8 +18,7 @@ class InteractiveFramesExample : JavaPlugin(), Listener {
 
 //    private var handles = mutableListOf<FrameHandleOld>()
 
-    private var player: Player? = null
-    private lateinit var handle: StaticFrameHandle
+    private lateinit var handle: SingletonStaticFrameHandle
 
     override fun onEnable() {
         val transformer = MinecraftColorPalette()
@@ -31,12 +30,7 @@ class InteractiveFramesExample : JavaPlugin(), Listener {
 //        this.handles.add(FrameHandleOld(this, frameProvider, Location(Bukkit.getWorlds()[0], 245.0, 64.0, -71.0), BlockFace.WEST))
 //        this.handles.forEach(FrameHandleOld::spawn)
 
-        this.handle = StaticFrameHandle(frameProvider(), Bukkit.getWorlds().first())
-
-        Bukkit.getScheduler().runTaskTimerAsynchronously(this, Runnable {
-            this.player?.let { this.handle.updateTargetViewportCoordinates(it) }
-            this.handle.tick()
-        }, 1L, 1L)
+        this.handle = SingletonStaticFrameHandle(this, frameProvider())
 
         Bukkit.getPluginManager().registerEvents(this, this)
     }
@@ -51,7 +45,7 @@ class InteractiveFramesExample : JavaPlugin(), Listener {
             this.handle.direction = event.player.facing.oppositeFace
             this.handle.topLeftLocation = event.player.eyeLocation.block.getRelative(event.player.facing, 2).location.toVector()
             this.handle.spawn(event.player)
-            this.player = event.player
+            this.handle.controllingPlayer = event.player
             this.handle.frame.state = State.ACTIVE
 //            this.handles.forEach { it.controllingPlayer = event.player }
         }, 3 * 20L)

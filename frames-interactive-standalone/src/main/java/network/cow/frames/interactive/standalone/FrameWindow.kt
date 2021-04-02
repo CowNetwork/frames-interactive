@@ -48,8 +48,6 @@ class FrameWindow(private val frameProvider: () -> InteractiveFrame, title: Stri
 
                 if (event.button == MouseEvent.BUTTON1) {
                     frame.setInputActive(Input.INTERACT_PRIMARY, true)
-                } else if (event.button == MouseEvent.BUTTON3) {
-                    frame.setInputActive(Input.INTERACT_SECONDARY, true)
                 }
             }
 
@@ -58,8 +56,6 @@ class FrameWindow(private val frameProvider: () -> InteractiveFrame, title: Stri
 
                 if (event.button == MouseEvent.BUTTON1) {
                     frame.setInputActive(Input.INTERACT_PRIMARY, false)
-                } else if (event.button == MouseEvent.BUTTON3) {
-                    frame.setInputActive(Input.INTERACT_SECONDARY, false)
                 }
             }
         })
