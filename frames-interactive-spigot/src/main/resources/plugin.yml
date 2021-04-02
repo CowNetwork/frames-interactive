@@ -2,3 +2,4 @@ name: InteractiveFrames
 version: 1.0.0
 main: network.cow.frames.interactive.spigot.InteractiveFramePlugin
 author: Benedikt "Benediktator" Wüller
+api-version: 1.16

@@ -24,6 +24,21 @@
         <kotlin.version>1.4.32</kotlin.version>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>cow-releases</id>
+            <url>https://maven.cow.network/releases</url>
+        </repository>
+        <repository>
+            <id>cow</id>
+            <url>https://maven.cow.network/internal</url>
+        </repository>
+        <repository>
+            <id>dmulloy2-repo</id>
+            <url>https://repo.dmulloy2.net/repository/public/</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
