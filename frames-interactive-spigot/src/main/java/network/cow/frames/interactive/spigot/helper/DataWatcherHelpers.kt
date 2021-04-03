@@ -1,4 +1,4 @@
-package network.cow.frames.interactive.spigot
+package network.cow.frames.interactive.spigot.helper
 
 import com.comphenix.protocol.wrappers.WrappedDataWatcher
 import org.bukkit.Bukkit

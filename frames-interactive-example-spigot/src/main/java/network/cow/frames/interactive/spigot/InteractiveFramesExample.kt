@@ -1,10 +1,10 @@
 package network.cow.frames.interactive.spigot
 
 import network.cow.frames.color.MinecraftColorPalette
-import network.cow.frames.interactive.State
+import network.cow.frames.interactive.InteractiveFrame
 import network.cow.frames.interactive.example.ExampleFrame
+import network.cow.frames.interactive.spigot.handle.StationaryFrameHandle
 import org.bukkit.Bukkit
-import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
@@ -18,7 +18,7 @@ class InteractiveFramesExample : JavaPlugin(), Listener {
 
 //    private var handles = mutableListOf<FrameHandleOld>()
 
-    private lateinit var handle: SingletonStaticFrameHandle
+    private lateinit var handle: StationaryFrameHandle<out InteractiveFrame>
 
     override fun onEnable() {
         val transformer = MinecraftColorPalette()
@@ -30,7 +30,8 @@ class InteractiveFramesExample : JavaPlugin(), Listener {
 //        this.handles.add(FrameHandleOld(this, frameProvider, Location(Bukkit.getWorlds()[0], 245.0, 64.0, -71.0), BlockFace.WEST))
 //        this.handles.forEach(FrameHandleOld::spawn)
 
-        this.handle = SingletonStaticFrameHandle(this, frameProvider())
+//        this.handle = SingletonStaticFrameHandle(this, frameProvider())
+        this.handle = StationaryFrameHandle(this, frameProvider)
 
         Bukkit.getPluginManager().registerEvents(this, this)
     }
@@ -45,10 +46,12 @@ class InteractiveFramesExample : JavaPlugin(), Listener {
             this.handle.direction = event.player.facing.oppositeFace
             this.handle.topLeftLocation = event.player.eyeLocation.block.getRelative(event.player.facing, 2).location.toVector()
             this.handle.spawn(event.player)
-            this.handle.controllingPlayer = event.player
-            this.handle.frame.state = State.ACTIVE
-//            this.handles.forEach { it.controllingPlayer = event.player }
         }, 3 * 20L)
+
+        Bukkit.getScheduler().runTaskLater(this, Runnable {
+            this.handle.player = event.player
+        }, 5 * 20L)
+
     }
 
 }

@@ -1,10 +1,8 @@
 package network.cow.frames.interactive.spigot
 
-import com.comphenix.protocol.wrappers.BlockPosition
-import com.comphenix.protocol.wrappers.WrappedBlockData
 import network.cow.frames.interactive.InteractiveFrame
-import network.cow.frames.interactive.State
-import network.cow.protocol.wrappers.WrapperPlayServerBlockChange
+import network.cow.frames.interactive.spigot.helper.getDataWatcher
+import network.cow.frames.interactive.spigot.helper.getMapLocation
 import network.cow.protocol.wrappers.WrapperPlayServerEntityDestroy
 import network.cow.protocol.wrappers.WrapperPlayServerEntityMetadata
 import network.cow.protocol.wrappers.WrapperPlayServerSpawnEntity
@@ -28,7 +26,7 @@ import kotlin.math.roundToInt
 /**
  * @author Benedikt Wüller
  */
-abstract class StaticFrameHandle(plugin: JavaPlugin) : FrameHandle(plugin) {
+abstract class StaticFrameHandle(plugin: JavaPlugin) : FrameHandleOld(plugin) {
 
     var topLeftLocation: Vector = Vector()
     var direction: BlockFace = BlockFace.NORTH
@@ -45,8 +43,6 @@ abstract class StaticFrameHandle(plugin: JavaPlugin) : FrameHandle(plugin) {
 
     override fun tick() {
         this.activePlayers.forEach { (player, frame) ->
-            if (frame.state == State.INACTIVE) return
-
             frame.tick()
 
             if (!frame.hasUpdatedSections()) return
@@ -88,7 +84,7 @@ abstract class StaticFrameHandle(plugin: JavaPlugin) : FrameHandle(plugin) {
 
         val topLeft = this.topLeftLocation
         val bottomRight = getMapLocation(this.topLeftLocation, this.direction, dimensions.width - 1, dimensions.height - 1)
-        val boundingBoxDepth = 0.0625
+        val boundingBoxDepth = 0.07
 
         return when(this.direction) {
             BlockFace.NORTH -> BoundingBox(bottomRight.x, bottomRight.y, bottomRight.z + 1.0 - boundingBoxDepth, topLeft.x + 1.0, topLeft.y + 1.0, topLeft.z + 1.0)
@@ -174,7 +170,7 @@ abstract class StaticFrameHandle(plugin: JavaPlugin) : FrameHandle(plugin) {
         }
     }
 
-    override fun getFrameDefinitions(frame: InteractiveFrame): List<FrameHandle.FrameDefinition> {
+    override fun getFrameDefinitions(frame: InteractiveFrame): List<FrameHandleOld.FrameDefinition> {
         return this.frameDefinitions.getOrPut(frame) {
             val definitions = mutableListOf<FrameDefinition>()
             val dimensions = this.getFrameCounts(frame)
@@ -189,6 +185,6 @@ abstract class StaticFrameHandle(plugin: JavaPlugin) : FrameHandle(plugin) {
         }
     }
 
-    private class FrameDefinition(val entityId: Int, val uuid: UUID, mapId: Int) : FrameHandle.FrameDefinition(mapId)
+    private class FrameDefinition(val entityId: Int, val uuid: UUID, mapId: Int) : FrameHandleOld.FrameDefinition(mapId)
 
 }

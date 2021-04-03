@@ -1,6 +1,8 @@
 package network.cow.frames.interactive.spigot
 
 import network.cow.frames.interactive.InteractiveFrame
+import network.cow.frames.interactive.spigot.helper.createMapData
+import network.cow.frames.interactive.spigot.helper.getMapBounds
 import network.cow.protocol.wrappers.WrapperPlayServerMap
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -14,7 +16,7 @@ import kotlin.math.ceil
 /**
  * @author Benedikt Wüller
  */
-abstract class FrameHandle(protected val plugin: JavaPlugin) {
+abstract class FrameHandleOld(protected val plugin: JavaPlugin) {
 
     companion object {
         private val MAP_ID_FIELD = AtomicInteger(420_000)
@@ -82,6 +84,8 @@ abstract class FrameHandle(protected val plugin: JavaPlugin) {
             }
         }
     }
+
+
 
     protected open class FrameDefinition(val mapId: Int)
 
