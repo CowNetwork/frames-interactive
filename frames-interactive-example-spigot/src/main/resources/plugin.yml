@@ -1,5 +1,5 @@
 name: InteractiveFramesExample
-version: 1.0.0
+version: 0.1.0
 main: network.cow.frames.interactive.spigot.InteractiveFramesExample
 author: Benedikt "Benediktator" Wüller
 api-version: 1.16

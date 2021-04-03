@@ -5,7 +5,7 @@
     <parent>
         <artifactId>frames-interactive</artifactId>
         <groupId>network.cow.frames</groupId>
-        <version>1.0.0</version>
+        <version>0.1.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -20,12 +20,12 @@
         <dependency>
             <groupId>network.cow.frames</groupId>
             <artifactId>frames-interactive-standalone</artifactId>
-            <version>1.0.0</version>
+            <version>0.1.0</version>
         </dependency>
         <dependency>
             <groupId>network.cow.frames</groupId>
             <artifactId>frames-interactive-example</artifactId>
-            <version>1.0.0</version>
+            <version>0.1.0</version>
         </dependency>
     </dependencies>
 
