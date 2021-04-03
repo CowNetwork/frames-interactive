@@ -31,7 +31,7 @@ import kotlin.math.roundToInt
 class HandheldFrameHandle<T : HandheldInteractiveFrame>(
     plugin: JavaPlugin,
     frameProvider: () -> T,
-    private val player: Player,
+    val player: Player,
     private val itemName: String,
     private vararg val itemLore: String
 ) : FrameHandle<T>(plugin, frameProvider), Listener {
@@ -66,11 +66,11 @@ class HandheldFrameHandle<T : HandheldInteractiveFrame>(
     }
 
     override fun updateCursor(frame: InteractiveFrame) {
-        val position = this.getCanvasCursorPosition(frame) ?: return
+        val position = this.getCanvasCursorPosition() ?: return
         this.frame.setCanvasCursorPosition(position)
     }
 
-    private fun getCanvasCursorPosition(frame: InteractiveFrame): Point? {
+    private fun getCanvasCursorPosition(): Point? {
         infix fun Double.floorMod(other: Double) = this - floor(this / other) * other
 
         val yawDelta = ((this.player.location.yaw - this.initialYaw + 180.0) floorMod 360.0) - 180.0
@@ -102,7 +102,7 @@ class HandheldFrameHandle<T : HandheldInteractiveFrame>(
 
     override fun handleLeftClick(player: Player) {
         if (this.player != player) return
-        this.getCanvasCursorPosition(this.frame) ?: return
+        this.getCanvasCursorPosition() ?: return
 
         this.frame.setInputActive(Input.INTERACT_PRIMARY, true)
         Bukkit.getScheduler().runTaskLater(this.plugin, Runnable {
@@ -131,9 +131,11 @@ class HandheldFrameHandle<T : HandheldInteractiveFrame>(
         }
     }
 
-    private fun finalize() {
+    override fun destroy() {
+        super.destroy()
         HandlerList.unregisterAll(this)
         freeMapView(this.mapView)
+        this.activePlayers.clear()
     }
 
     override fun invalidate(player: Player) {

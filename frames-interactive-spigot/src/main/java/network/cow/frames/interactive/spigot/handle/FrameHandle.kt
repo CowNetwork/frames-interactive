@@ -55,7 +55,11 @@ abstract class FrameHandle<T : InteractiveFrame>(protected val plugin: JavaPlugi
 
     protected abstract fun invalidate(player: Player)
 
-    private fun finalize() {
+    protected fun finalize() {
+        this.destroy()
+    }
+
+    open fun destroy() {
         HandlerList.unregisterAll(this.listener)
     }
 

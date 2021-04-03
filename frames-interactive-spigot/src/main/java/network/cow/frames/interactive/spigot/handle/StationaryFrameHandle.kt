@@ -265,8 +265,15 @@ class StationaryFrameHandle<T : InteractiveFrame>(plugin: JavaPlugin, frameProvi
         }, 2L)
     }
 
+    override fun destroy() {
+        super.destroy()
+        this.remove(*this.activePlayers.toTypedArray())
+        this.activePlayers.clear()
+        this.playersInRange.clear()
+    }
+
     override fun invalidate(player: Player) {
-        this.activePlayers.remove(player)
+        this.remove(player)
     }
 
     private data class ItemFrame(val x: Int, val y: Int, val entityId: Int = getNextEntityId(), val uuid: UUID = UUID.randomUUID(), val mapId: Int = getNextMapId())
