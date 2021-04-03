@@ -11,9 +11,14 @@ import java.awt.Rectangle
 /**
  * @author Benedikt Wüller
  */
-abstract class FrameHandle(protected val plugin: JavaPlugin) : Listener {
+abstract class FrameHandle<T : InteractiveFrame>(protected val plugin: JavaPlugin, private val frameProvider: () -> T) : Listener {
 
-    private val listener = FrameHandleListener(this::handleLeftClick)
+    private val listener = FrameHandleListener({
+        if (!this.shouldUpdate()) return@FrameHandleListener
+        this.handleLeftClick(it)
+    }, this::invalidate)
+
+    protected var frame: InteractiveFrame = this.frameProvider()
 
     init {
         Bukkit.getPluginManager().registerEvents(this.listener, this.plugin)
@@ -21,14 +26,14 @@ abstract class FrameHandle(protected val plugin: JavaPlugin) : Listener {
     }
 
     protected open fun tick() {
-        val frame = this.getFrame()
+        if (!this.shouldUpdate()) return
 
-        this.updateCursor(frame)
+        this.updateCursor(this.frame)
 
-        frame.tick()
+        this.frame.tick()
 
-        if (!frame.hasUpdatedSections()) return
-        val sections = frame.pullUpdatedSections()
+        if (!this.frame.hasUpdatedSections()) return
+        val sections = this.frame.pullUpdatedSections()
 
         this.renderSections(sections)
     }
@@ -37,13 +42,20 @@ abstract class FrameHandle(protected val plugin: JavaPlugin) : Listener {
 
     protected abstract fun renderSections(sections: List<Rectangle>)
 
-    protected abstract fun getFrame(): InteractiveFrame
-
     protected abstract fun handleLeftClick(player: Player)
 
-    // TODO: WASD and Chat
+    protected open fun shouldUpdate(): Boolean = true
 
-    fun finalize() {
+    fun reset() {
+        this.frame = this.frameProvider()
+        this.onReset()
+    }
+
+    protected open fun onReset() = Unit
+
+    protected abstract fun invalidate(player: Player)
+
+    private fun finalize() {
         HandlerList.unregisterAll(this.listener)
     }
 

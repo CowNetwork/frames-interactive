@@ -9,6 +9,6 @@ import java.awt.Dimension
  */
 
 fun main() {
-    val window = FrameWindow({ ExampleFrame(Dimension(512, 512)) }, "ExampleFrame")
+    val window = FrameWindow({ ExampleFrame() }, "ExampleFrame", 2.0)
     window.start()
 }

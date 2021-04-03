@@ -34,13 +34,11 @@ import kotlin.math.roundToInt
 /**
  * @author Benedikt Wüller
  */
-class StationaryFrameHandle<T : InteractiveFrame>(plugin: JavaPlugin, val frameProvider: () -> T) : FrameHandle(plugin) {
+class StationaryFrameHandle<T : InteractiveFrame>(plugin: JavaPlugin, frameProvider: () -> T) : FrameHandle<T>(plugin, frameProvider) {
 
     companion object {
         private const val BOUNDING_BOX_PADDING = 0.125
     }
-
-    private var frame: InteractiveFrame = this.frameProvider()
 
     private val activePlayers = mutableSetOf<Player>()
     private val playersInRange = mutableSetOf<Player>()
@@ -74,7 +72,7 @@ class StationaryFrameHandle<T : InteractiveFrame>(plugin: JavaPlugin, val frameP
 
             if (value == null) {
                 // If the player is unset, create a new frame.
-                this.frame = this.frameProvider()
+                this.reset()
             } else {
                 // Otherwise, set the frame state to active.
                 this.frame.state = State.ACTIVE
@@ -115,9 +113,9 @@ class StationaryFrameHandle<T : InteractiveFrame>(plugin: JavaPlugin, val frameP
     }
 
     override fun renderSections(sections: List<Rectangle>) {
-        sections.forEach { section ->
-            val players = this.activePlayers.filter(this::isInRange).toTypedArray()
+        val players = this.activePlayers.filter(this::isInRange).toTypedArray()
 
+        sections.forEach { section ->
             this.itemFrames.forEach inner@{ frame ->
                 val bounds = getMapBounds(frame.x, frame.y)
                 val intersection = section.createIntersection(bounds).bounds
@@ -136,7 +134,7 @@ class StationaryFrameHandle<T : InteractiveFrame>(plugin: JavaPlugin, val frameP
     }
 
     private fun calculateTargetViewportCoordinates(player: Player): Point? {
-        val boundingBox = this.getBoundingBox(this.frame)
+        val boundingBox = this.getBoundingBox()
         val rayTrace = boundingBox.rayTrace(player.eyeLocation.toVector(), player.location.direction, this.maxCursorDistance) ?: return null
         val position = rayTrace.hitPosition
 
@@ -154,7 +152,7 @@ class StationaryFrameHandle<T : InteractiveFrame>(plugin: JavaPlugin, val frameP
         )
     }
 
-    private fun getBoundingBox(frame: InteractiveFrame): BoundingBox {
+    private fun getBoundingBox(): BoundingBox {
         val topLeft = this.topLeftLocation
         val bottomRight = getMapLocation(this.topLeftLocation, this.direction, this.columns - 1, this.rows - 1)
         val boundingBoxDepth = 0.07
@@ -253,15 +251,7 @@ class StationaryFrameHandle<T : InteractiveFrame>(plugin: JavaPlugin, val frameP
         }
     }
 
-    fun reset() {
-        val player = this.player
-        this.player = null
-        this.player = player
-    }
-
     private fun isInRange(player: Player) = player.location.toVector().distance(this.topLeftLocation) <= this.updateRange
-
-    override fun getFrame(): InteractiveFrame = this.frame
 
     override fun handleLeftClick(player: Player) {
         if (player != this.player) return
@@ -273,6 +263,10 @@ class StationaryFrameHandle<T : InteractiveFrame>(plugin: JavaPlugin, val frameP
         Bukkit.getScheduler().runTaskLater(this.plugin, Runnable {
             this.frame.setInputActive(Input.INTERACT_PRIMARY, false)
         }, 2L)
+    }
+
+    override fun invalidate(player: Player) {
+        this.activePlayers.remove(player)
     }
 
     private data class ItemFrame(val x: Int, val y: Int, val entityId: Int = getNextEntityId(), val uuid: UUID = UUID.randomUUID(), val mapId: Int = getNextMapId())

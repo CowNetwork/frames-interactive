@@ -13,18 +13,19 @@ import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import javax.swing.JCheckBox
 import javax.swing.JFrame
+import kotlin.math.roundToInt
 import kotlin.system.exitProcess
 
 /**
  * @author Benedikt Wüller
  */
-class FrameWindow(private val frameProvider: () -> InteractiveFrame, title: String) : KeyListener {
+class FrameWindow(private val frameProvider: () -> InteractiveFrame, title: String, private val scale: Double = 1.0) : KeyListener {
 
     private var isPaused: Boolean = false
 
     private var frame = this.frameProvider()
     private val window = JFrame(title)
-    private val viewport = FrameViewport(this.window)
+    private val viewport = FrameViewport(this.window, scale)
 
     init {
         this.window.layout = BorderLayout()
@@ -63,12 +64,12 @@ class FrameWindow(private val frameProvider: () -> InteractiveFrame, title: Stri
         this.viewport.addMouseMotionListener(object : MouseAdapter() {
             override fun mouseMoved(event: MouseEvent) {
                 if (frame.isPaused) return
-                frame.setViewportCursorPosition(Point(event.x, event.y))
+                frame.setViewportCursorPosition(Point((event.x / scale).roundToInt(), (event.y / scale).roundToInt()))
             }
 
             override fun mouseDragged(event: MouseEvent) {
                 if (frame.isPaused) return
-                frame.setViewportCursorPosition(Point(event.x, event.y))
+                frame.setViewportCursorPosition(Point((event.x / scale).roundToInt(), (event.y / scale).roundToInt()))
             }
         })
 

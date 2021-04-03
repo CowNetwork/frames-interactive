@@ -7,11 +7,12 @@ import java.awt.Rectangle
 import java.awt.image.BufferedImage
 import javax.swing.JFrame
 import javax.swing.JPanel
+import kotlin.math.roundToInt
 
 /**
  * @author Benedikt Wüller
  */
-class FrameViewport(private val window: JFrame) : JPanel() {
+class FrameViewport(private val window: JFrame, private val scale: Double = 1.0) : JPanel() {
 
     var sections = mutableListOf<Rectangle>()
 
@@ -32,7 +33,7 @@ class FrameViewport(private val window: JFrame) : JPanel() {
     }
 
     private fun updateSize() {
-        this.preferredSize = Dimension(this.currentImage?.width ?: 0, this.currentImage?.height ?: 0)
+        this.preferredSize = Dimension(((this.currentImage?.width ?: 0) * this.scale).toInt(), ((this.currentImage?.height ?: 0) * this.scale).toInt())
         this.size = this.preferredSize
         this.window.pack()
     }
@@ -61,7 +62,10 @@ class FrameViewport(private val window: JFrame) : JPanel() {
         if (this.debug) {
             for (section in this.sections) {
                 context.color = Color.YELLOW
-                context.drawRect(section.x, section.y, section.width, section.height)
+                context.drawRect(
+                    (section.x * this.scale).roundToInt(), (section.y * this.scale).roundToInt(),
+                    (section.width * this.scale).roundToInt(), (section.height * this.scale).roundToInt()
+                )
             }
         }
     }

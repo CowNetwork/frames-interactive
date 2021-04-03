@@ -4,16 +4,42 @@ import network.cow.frames.color.ColorTransformer
 import network.cow.frames.color.PaletteColorTransformer
 import network.cow.frames.interactive.InteractiveFrame
 import network.cow.protocol.wrappers.WrapperPlayServerMap
+import org.bukkit.Bukkit
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
+import org.bukkit.map.MapView
 import org.bukkit.util.Vector
 import java.awt.Rectangle
 import java.awt.image.BufferedImage
+import java.util.Deque
+import java.util.LinkedList
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * @author Benedikt Wüller
  */
+
+private val MAP_POOL: Deque<Int> = LinkedList()
+
+fun allocateMapView(): MapView {
+    synchronized(MAP_POOL) {
+        if (MAP_POOL.isEmpty()) {
+            val view = Bukkit.createMap(Bukkit.getWorlds().first())
+            view.renderers.forEach { view.removeRenderer(it) }
+            view.isUnlimitedTracking = false
+            view.isLocked = true
+            return view
+        }
+        return Bukkit.getMap(MAP_POOL.poll())!!
+    }
+}
+
+@Synchronized
+fun freeMapView(view: MapView) {
+    synchronized(MAP_POOL) {
+        MAP_POOL.addLast(view.id)
+    }
+}
 
 private val MAP_ID_FIELD = AtomicInteger(420_000)
 private val ENTITY_ID_FIELD = AtomicInteger(420_000)
@@ -50,7 +76,7 @@ fun sendMapData(id: Int, transformer: ColorTransformer, viewport: BufferedImage,
     packet.itemDamage = id
     packet.scale = 0
     packet.trackingPosition = false
-    packet.isLocked = false
+    packet.isLocked = true
     packet.columns = section.x % 128
     packet.rows = section.y % 128
     packet.x = section.width

@@ -6,6 +6,7 @@ import network.cow.frames.color.DefaultColorTransformer
 import network.cow.frames.component.ColorComponent
 import network.cow.frames.component.CompoundComponent
 import network.cow.frames.component.TextComponent
+import network.cow.frames.interactive.HandheldInteractiveFrame
 import network.cow.frames.interactive.InteractiveFrame
 import network.cow.frames.interactive.Input
 import network.cow.frames.interactive.State
@@ -17,17 +18,17 @@ import java.awt.Point
 /**
  * @author Benedikt Wüller
  */
-class ExampleFrame(viewportDimensions: Dimension, transformer: ColorTransformer = DefaultColorTransformer())
-    : InteractiveFrame(Dimension(256, 256), viewportDimensions, 50L, transformer) {
+class ExampleFrame(transformer: ColorTransformer = DefaultColorTransformer())
+    : HandheldInteractiveFrame(Dimension(128, 128), 50L, transformer) {
 
     private val fontSmall = Font(Font.SANS_SERIF, Font.BOLD, 12)
-    private val fontBig = Font(Font.SANS_SERIF, Font.BOLD, 15)
+    private val fontBig = Font(Font.SANS_SERIF, Font.BOLD, 10)
 
     private val idleComponent = CompoundComponent(Point(), this.canvasDimensions)
 
     private val baseComponent = CompoundComponent(Point(), this.canvasDimensions)
     private val cursorPositionText = TextComponent(Point(this.canvasDimensions.width / 2, 10), "0x0", Color.DARK_GRAY, fontSmall, Alignment.TOP_CENTER)
-    private val cursorIndicator = ColorComponent(Point(), Dimension(5, 5), Color.BLUE)
+    private val cursorIndicator = ColorComponent(Point(), Dimension(2, 2), Color.BLUE)
 
     private val keyComponents = mutableMapOf<Input, TextComponent>()
 
@@ -40,7 +41,7 @@ class ExampleFrame(viewportDimensions: Dimension, transformer: ColorTransformer 
         this.baseComponent.addComponent(this.cursorIndicator)
 
         Input.values().forEachIndexed { index, key ->
-            val component = TextComponent(Point(this.canvasDimensions.width / 2, 30 + 20 * (index + 1)), key.name, Color.DARK_GRAY, fontBig, Alignment.TOP_CENTER)
+            val component = TextComponent(Point(this.canvasDimensions.width / 2, 15 + 12 * (index + 1)), key.name, Color.DARK_GRAY, fontBig, Alignment.TOP_CENTER)
             this.keyComponents[key] = component
             this.baseComponent.addComponent(component)
         }
